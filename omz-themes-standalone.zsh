@@ -12,6 +12,10 @@ if ! typeset -f git_prompt_info > /dev/null; then
   source "$ZSH"/lib/git.zsh
 fi
 
+if ! typeset -f nvm_prompt_info > /dev/null; then
+  source "$ZSH"/lib/nvm.zsh
+fi
+
 if ! typeset -f ruby_prompt_info > /dev/null; then
   source "$ZSH"/lib/prompt_info_functions.zsh
 fi
