@@ -1,9 +1,21 @@
+### ------------------------------------------------------------------------ {{{
+### project: omz-themes-standalone
+### author: mattmc3 (c) 2019
+### purpose:
+###   Take the excellent oh-my-zsh project and its themes and create a
+###   plugin that just supports the themeing functionality. The rest of
+###   oh-my-zsh can also be used without the themes as well.
+###
+###   Separating the themes into their own plugin makes it really easy to use
+###   a plugin manager like antibody which doesn't easily support omz themes.
+### ------------------------------------------------------------------------ }}}
+
 this_dir="${0:A:h}"
 ZSH="${ZSH:-$this_dir/oh-my-zsh}"
 
 ZSH_THEME="${ZSH_THEME:-refined}"
 
-# load prompt related libs
+### Load prompt related omz libs ------------------------------------------- {{{
 if ! typeset -f bzr_prompt_info > /dev/null; then
   source "$ZSH"/lib/bzr.zsh
 fi
@@ -21,8 +33,9 @@ if ! typeset -f ruby_prompt_info > /dev/null; then
 fi
 
 source "$ZSH"/lib/theme-and-appearance.zsh
+### ------------------------------------------------------------------------ }}}
 
-# Load stuff from the plugins areas that themes use
+### Load omz plugins dependencies that themes use -------------------------- {{{
 # lots of themes use the battery plugin
 if ! typeset -f battery_pct_prompt > /dev/null; then
   source "$ZSH"/plugins/battery/battery.plugin.zsh
@@ -34,16 +47,20 @@ function work_in_progress() {
     echo "WIP!!"
   fi
 }
+### ------------------------------------------------------------------------ }}}
 
-# remove existing theme variables
-PROMPT=
-RPROMPT=
-PROMPT2=
-RPS1=
+# reset any existing theme related variables
+function __reset_theme_vars {
+  PROMPT=
+  RPROMPT=
+  PROMPT2=
+  RPS1=
+}
 
 # from oh-my-zsh/oh-my-zsh.zsh:99
 # Load the theme
 if [[ "$ZSH_THEME" == "random" ]]; then
+  __reset_theme_vars
   if [[ "${(t)ZSH_THEME_RANDOM_CANDIDATES}" = "array" ]] && [[ "${#ZSH_THEME_RANDOM_CANDIDATES[@]}" -gt 0 ]]; then
     themes=($ZSH/themes/${^ZSH_THEME_RANDOM_CANDIDATES}.zsh-theme)
   else
@@ -56,6 +73,7 @@ if [[ "$ZSH_THEME" == "random" ]]; then
   echo "[oh-my-zsh] Random omz theme '$RANDOM_THEME:t:r' loaded..."
 else
   if [ ! "$ZSH_THEME" = ""  ]; then
+    __reset_theme_vars
     if [ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]; then
       source "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme"
     elif [ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]; then
