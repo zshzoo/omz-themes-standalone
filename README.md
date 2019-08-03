@@ -1,7 +1,11 @@
 # omz-themes-standalone
 
-A standalone plugin that gives you the oh-my-zsh themes without requiring
-everything else.
+A standalone plugin that gives you the [oh-my-zsh][omz] themes without requiring
+everything else that comes with oh-my-zsh.
+
+**Note:** this plugin can it easy to use parts of omz with plugin managers like
+[antibody][antibody] without requiring all the rest.
+
 
 ## Usage
 
@@ -14,6 +18,10 @@ Add this to your `.zshrc` file:
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="refined"
 ```
+
+## Themes
+
+Check out previews of the [oh-my-zsh themes here][omz-themes].
 
 ## Installation
 
@@ -59,3 +67,8 @@ your other `zgen load` calls:
 ```zsh
 zgen load mattmc3/omz-themes-standalone
 ```
+
+
+[antibody]:     https://getantibody.github.io
+[omz]:          https://github.com/robbyrussell/oh-my-zsh
+[omz-themes]:   https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
