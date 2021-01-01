@@ -1,85 +1,51 @@
-### ------------------------------------------------------------------------ {{{
-### project: omz-themes-standalone
-### author: mattmc3 (c) 2019
-### purpose:
-###   Take the excellent oh-my-zsh project and its themes and create a
-###   plugin that just supports the themeing functionality. The rest of
-###   oh-my-zsh can also be used without the themes as well.
-###
-###   Separating the themes into their own plugin makes it really easy to use
-###   a plugin manager like antibody which doesn't easily support omz themes.
-### ------------------------------------------------------------------------ }}}
+### make sure we have OMZ set up
+ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+[[ -d $ZSH ]] || git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh "$ZSH"
 
-this_dir="${0:A:h}"
-ZSH="${ZSH:-$this_dir/oh-my-zsh}"
-
-ZSH_THEME="${ZSH_THEME:-refined}"
-
-### Load prompt related omz libs ------------------------------------------- {{{
-if ! typeset -f bzr_prompt_info > /dev/null; then
-  source "$ZSH"/lib/bzr.zsh
-fi
-
-if ! typeset -f git_prompt_info > /dev/null; then
-  source "$ZSH"/lib/git.zsh
-fi
-
-if ! typeset -f nvm_prompt_info > /dev/null; then
-  source "$ZSH"/lib/nvm.zsh
-fi
-
-if ! typeset -f ruby_prompt_info > /dev/null; then
-  source "$ZSH"/lib/prompt_info_functions.zsh
-fi
-
+### omz theme lib dependencies
+typeset -f bzr_prompt_info > /dev/null || source "$ZSH"/lib/bzr.zsh
+typeset -f git_prompt_info > /dev/null || source "$ZSH"/lib/git.zsh
+typeset -f nvm_prompt_info > /dev/null || source "$ZSH"/lib/nvm.zsh
+typeset -f ruby_prompt_info > /dev/null || source "$ZSH"/lib/prompt_info_functions.zsh
 source "$ZSH"/lib/theme-and-appearance.zsh
-### ------------------------------------------------------------------------ }}}
 
-### Load omz plugins dependencies that themes use -------------------------- {{{
+### omz theme plugin dependencies
 # lots of themes use the battery plugin
-if ! typeset -f battery_pct_prompt > /dev/null; then
-  source "$ZSH"/plugins/battery/battery.plugin.zsh
-fi
+typeset -f battery_pct_prompt > /dev/null || source "$ZSH"/plugins/battery/battery.plugin.zsh
 
-# some themes require this from the git plugin
+# some themes require this function from the git plugin
 function work_in_progress() {
   if $(git log -n 1 2>/dev/null | grep -q -c "\-\-wip\-\-"); then
     echo "WIP!!"
   fi
 }
-### ------------------------------------------------------------------------ }}}
 
-# reset any existing theme related variables
-function __reset_theme_vars {
-  PROMPT=
-  RPROMPT=
-  PROMPT2=
-  RPS1=
+function set_omz_prompt {
+  local theme=$1
+  [[ -f $ZSH/themes/${theme}.zsh-theme ]] || return 1
+  ZSH_THEME=$theme
+
+  # themes are bad at reseting themselves, so let's help out by resetting to
+  # zsh defaults before applying a new theme
+  PROMPT='%n@%m %1~ %# '
+  PROMPT2='%_> '
+  PROMPT3='?# '
+  PROMPT4='+%N:%i> '
+  PS1=$PROMPT
+  PS2=$PROMPT2
+  PS3=$PROMPT3
+  PS4=$PROMPT4
+  SPROMPT='zsh: correct ''%R'' to ''%r'' [nyae]? '
+  RPROMPT=''
+  RPS1=''
+
+  # set the theme
+  source $ZSH/themes/$ZSH_THEME.zsh-theme
 }
 
-# from oh-my-zsh/oh-my-zsh.zsh:99
-# Load the theme
-if [[ "$ZSH_THEME" == "random" ]]; then
-  __reset_theme_vars
-  if [[ "${(t)ZSH_THEME_RANDOM_CANDIDATES}" = "array" ]] && [[ "${#ZSH_THEME_RANDOM_CANDIDATES[@]}" -gt 0 ]]; then
-    themes=($ZSH/themes/${^ZSH_THEME_RANDOM_CANDIDATES}.zsh-theme)
-  else
-    themes=($ZSH/themes/*zsh-theme)
-  fi
-  N=${#themes[@]}
-  ((N=(RANDOM%N)+1))
-  RANDOM_THEME=${themes[$N]}
-  source "$RANDOM_THEME"
-  echo "[oh-my-zsh] Random omz theme '$RANDOM_THEME:t:r' loaded..."
-else
-  if [ ! "$ZSH_THEME" = ""  ]; then
-    __reset_theme_vars
-    if [ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]; then
-      source "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme"
-    elif [ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]; then
-      source "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme"
-    else
-      source "$ZSH/themes/$ZSH_THEME.zsh-theme"
-    fi
-  fi
+fpath+="${0:A:h}/themes"
+if ! typeset -f promptinit > /dev/null; then
+  autoload -U promptinit
 fi
+promptinit
+prompt ${ZSH_THEME:-robbyrussell}
