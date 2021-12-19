@@ -1,5 +1,5 @@
 ### make sure we have OMZ set up
-ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+ZSH="${ZSH:-${0:A:h}/.ohmyzsh}"
 [[ -d $ZSH ]] || git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh "$ZSH"
 
 ### omz theme lib dependencies
